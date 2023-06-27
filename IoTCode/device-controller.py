@@ -22,9 +22,16 @@ GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
 GPIO.setup(red_led_pin, GPIO.OUT, initial=GPIO.LOW) # Set pin 16 to be an output pin and set initial value to low (off)
 GPIO.setup(green_led_pin, GPIO.OUT, initial=GPIO.LOW) # Idem for pin 18
 
-producer = KafkaProducer(bootstrap_servers=KAFKA_SERVER+':'+KAFKA_PORT)
+producer = KafkaProducer(bootstrap_servers=[KAFKA_SERVER+':'+KAFKA_PORT],
+                         security_protocol='SASL_PLAINTEXT',
+                         sasl_mechanism='PLAIN',
+                         sasl_plain_username='bob',
+                         sasl_plain_password='bob-pass')
 last_reported_temp = 0
 last_reported_light_level = 0
+
+
+
 
 def read_temp_raw():
     f = open(device_file, 'r')
@@ -62,7 +69,12 @@ def read_light_sensor (pin_to_circuit):
     return count
 
 def consume_led_command():
-    consumer = KafkaConsumer(bootstrap_servers=KAFKA_SERVER+':'+KAFKA_PORT)
+    consumer = KafkaConsumer(bootstrap_servers=[KAFKA_SERVER+':'+KAFKA_PORT],
+                             security_protocol='SASL_PLAINTEXT',
+                             sasl_mechanism='PLAIN',
+                             sasl_plain_username='bob',
+                             sasl_plain_password='bob-pass')
+
     consumer.subscribe(topics=('ledcommand'))
     ledpin = 0
     for msg in consumer:
