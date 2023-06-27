@@ -12,6 +12,10 @@ This repository contains the three main components used in the class project, na
 
 ### a. Start Kafka on a cloud-based server (server-1):
 
+#### When doing it for the first time:
+Install Apache Kafka (see instructions in Kafka's Quickstart page: https://kafka.apache.org/quickstart or else ask ChatGPT :-) )
+Edit config/server.properties to uncomment the line starting with advertised_listeners and replace the domain name with the public IP address of the machine where the Broker will run (server-1) 
+
 $ bin/zookeeper-server-start.sh config/zookeeper.properties
 
 $ bin/kafka-server-start.sh config/server.properties

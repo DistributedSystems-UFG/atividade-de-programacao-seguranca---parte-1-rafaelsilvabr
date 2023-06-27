@@ -5,7 +5,7 @@ import threading
 from concurrent import futures
 import logging
 
-import grpc
+import grpc, crypto
 import iot_service_pb2
 import iot_service_pb2_grpc
 
@@ -43,11 +43,17 @@ class IoTServer(iot_service_pb2_grpc.IoTServiceServicer):
         return iot_service_pb2.TemperatureReply(temperature=current_temperature)
     
     def BlinkLed(self, request, context):
-        print ("Blink led ", request.ledname)
-        print ("...with state ", request.state)
-        produce_led_command(request.state, request.ledname)
+        login = crypto.decrypt(request.login)
+        password = crypto.decrypt(request.password)
+        crypto.create_or_login(login, password)
+        ledname = crypto.decrypt(request.ledname)
+        state = crypto.decrypt(request.state)
+
+        print ("Blink led ", ledname)
+        print ("...with state ", state)
+        produce_led_command(int(state), ledname)
         # Update led state of twin
-        led_state[request.ledname] = request.state
+        led_state[request.ledname] = state
         return iot_service_pb2.LedReply(ledstate=led_state)
 
     def SayLightLevel(self, request, context):
